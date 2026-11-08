@@ -1,0 +1,215 @@
+.detail-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-600);
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+
+  &:hover {
+    color: var(--primary-700);
+    transform: translateX(-3px);
+  }
+}
+
+.detail-card {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  background-color: var(--surface-card); /* Ya es reactivo */
+  border: 1px solid var(--border-color); /* Ya es reactivo */
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  &__cover {
+    min-height: 380px;
+    padding: 2.5rem 1.5rem;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+
+    &-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    &-cat {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      opacity: 0.85;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    &-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.25;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    &-author {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-top: 0.5rem;
+      display: block;
+    }
+
+    &-spine {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 18px;
+      background: rgba(0, 0, 0, 0.25);
+      box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &__content {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  &__rating {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main); /* Cambiado de --gray-800 */
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-main); /* Cambiado de --gray-900 */
+    line-height: 1.25;
+    margin-bottom: 0.25rem;
+  }
+
+  &__author {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  &__meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    /* Usar --bg-main genera un sutil contraste dentro de la tarjeta tanto en modo claro como oscuro */
+    background-color: var(--bg-main); /* Cambiado de --gray-50 */
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 500px) {
+      grid-template-columns: 1fr;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+
+      &__label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      &__val {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-main); /* Cambiado de --gray-900 */
+        margin-top: 0.2rem;
+
+        &--alert {
+          color: var(--danger-500);
+        }
+      }
+    }
+  }
+
+  &__synopsis {
+    margin-bottom: 2rem;
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main); /* Cambiado de --gray-900 */
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: var(--text-muted); /* Cambiado de --gray-600 */
+      line-height: 1.7;
+    }
+  }
+
+  &__actions {
+    margin-top: auto;
+  }
+
+  &__borrow-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+
+    /* Reemplazo los colores estáticos "light" por RGBA para que se adapte sin quemar la vista en modo oscuro */
+    background-color: rgba(var(--primary-rgb), 0.1); /* Cambiado de --primary-50 */
+    border: 1px solid rgba(var(--primary-rgb), 0.2); /* Cambiado de --primary-100 */
+    color: var(--primary-600); /* Ajustado para mejor contraste en ambos modos */
+
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}
+
+.detail-not-found {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--surface-card);
+  border-radius: var(--radius-lg);
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main); /* Cambiado de --gray-900 */
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+}

@@ -1,0 +1,39 @@
+.book-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.book-grid-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--surface-card); /* Ya es reactivo */
+  border: 2px dashed var(--border-color); /* Ya es reactivo */
+  border-radius: var(--radius-lg);
+
+  &__icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main); /* Cambiado de --gray-800 para que sea blanco en modo oscuro */
+    margin-bottom: 0.5rem;
+  }
+
+  &__desc {
+    color: var(--text-muted); /* Ya es reactivo */
+    font-size: 0.95rem;
+    max-width: 420px;
+    margin-bottom: 1.5rem;
+  }
+}

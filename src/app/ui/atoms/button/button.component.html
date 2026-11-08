@@ -1,0 +1,12 @@
+
+    <button
+      [type]="type()"
+      [disabled]="disabled()"
+      class="btn btn--{{ variant() }} btn--{{ size() }}"
+      [class]="'btn--' + variant() + ' btn--' + size()"
+      [class.btn--pill]="pill()"
+      [class.btn--full]="fullWidth()"
+      (click)="onClick($event)"
+    >
+      <ng-content />
+    </button>

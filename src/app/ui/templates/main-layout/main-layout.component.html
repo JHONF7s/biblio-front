@@ -1,0 +1,23 @@
+
+    <div class="layout">
+      <!-- Organism: Global App Header -->
+      <app-header />
+
+      <!-- Projected Main Viewport -->
+      <main class="layout__main">
+        <ng-content />
+      </main>
+
+      <!-- Organism: Side Drawer for Loans -->
+      <app-loan-drawer />
+
+      <!-- Molecule: Global Reactive Toast Notification -->
+      <app-toast />
+
+      <!-- Footer section -->
+      <footer class="layout__footer">
+        <div class="layout__footer-container">
+          <p>© 2026 BiblioAngular — Arquitectura Frontend con Atomic Design y Angular Zoneless Signals.</p>
+        </div>
+      </footer>
+    </div>

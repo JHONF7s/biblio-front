@@ -1,0 +1,89 @@
+
+    <app-main-layout>
+      <div class="detail-container">
+        <!-- Back Navigation -->
+        <a routerLink="/" class="back-link">
+          ← Volver al catálogo
+        </a>
+
+        @if (book(); as b) {
+          <article class="detail-card">
+            <!-- Cover Side -->
+            <div class="detail-card__cover" [style.background]="b.coverGradient">
+              <div class="detail-card__cover-content">
+                <span class="detail-card__cover-cat">{{ b.category }}</span>
+                <h2 class="detail-card__cover-title">{{ b.title }}</h2>
+                <span class="detail-card__cover-author">{{ b.author }}</span>
+              </div>
+              <div class="detail-card__cover-spine"></div>
+            </div>
+
+            <!-- Content Side -->
+            <div class="detail-card__content">
+              <div class="detail-card__header">
+                <app-badge [text]="b.category" variant="primary" [pill]="true" />
+                <span class="detail-card__rating">⭐ {{ b.rating }} / 5.0</span>
+              </div>
+
+              <h1 class="detail-card__title">{{ b.title }}</h1>
+              <p class="detail-card__author">Por <strong>{{ b.author }}</strong> · Publicado en {{ b.year }}</p>
+
+              <div class="detail-card__meta-grid">
+                <div class="meta-item">
+                  <span class="meta-item__label">ISBN</span>
+                  <span class="meta-item__val">{{ b.isbn }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-item__label">Páginas</span>
+                  <span class="meta-item__val">{{ b.pages }} págs.</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-item__label">Disponibilidad</span>
+                  <span class="meta-item__val" [class.meta-item__val--alert]="b.availableCopies === 0">
+                    {{ b.availableCopies }} copias
+                  </span>
+                </div>
+              </div>
+
+              <div class="detail-card__synopsis">
+                <h3>Sinopsis</h3>
+                <p>{{ b.description }}</p>
+              </div>
+
+              <!-- Action Bar -->
+              <div class="detail-card__actions">
+                @if (isBorrowed()) {
+                  <div class="detail-card__borrow-banner">
+                    <span>✓ Tienes este libro actualmente en préstamo.</span>
+                    <app-button
+                      variant="danger"
+                      size="md"
+                      (clicked)="onReturn(b.id)"
+                    >
+                      Devolver libro
+                    </app-button>
+                  </div>
+                } @else {
+                  <app-button
+                    variant="primary"
+                    size="lg"
+                    [disabled]="b.availableCopies <= 0"
+                    (clicked)="onBorrow(b.id)"
+                  >
+                    {{ b.availableCopies > 0 ? 'Solicitar Préstamo' : 'No disponible (Agotado)' }}
+                  </app-button>
+                }
+              </div>
+            </div>
+          </article>
+        } @else {
+          <div class="detail-not-found">
+            <h2>Libro no encontrado</h2>
+            <p>El libro con el identificador solicitado no existe en nuestro catálogo.</p>
+            <app-button variant="primary" (clicked)="goHome()">
+              Ir al inicio
+            </app-button>
+          </div>
+        }
+      </div>
+    </app-main-layout>

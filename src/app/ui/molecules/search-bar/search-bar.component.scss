@@ -1,0 +1,13 @@
+.search-bar {
+  /* Este componente es puramente estructural (layout flexbox). */
+  /* Al no tener colores fijos, no necesita cambios de variables semánticas. */
+  /* Los colores ya se están manejando internamente en el átomo .input-wrapper que arreglamos antes. */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+
+  &__input {
+    flex: 1;
+  }
+}

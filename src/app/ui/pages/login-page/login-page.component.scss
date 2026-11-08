@@ -1,0 +1,107 @@
+.login-container {
+  // Centrado vertical y horizontal para la pantalla de login
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px); // Ajusta según el alto de tu header
+  padding: 1.5rem 1rem;
+
+  form {
+    // Aplicamos el estilo de "tarjeta" heredado de tu .home-toolbar
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 1.5rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 420px;
+
+    h2 {
+      // Tomamos la tipografía limpia y pesada de tu .home-hero__title
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+      text-align: center;
+
+      word-break: normal;
+    }
+  }
+
+  .alert-error {
+    // Colores de alerta estándar (puedes cambiarlos a tus variables si tienes --error-bg)
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    border-radius: calc(var(--radius-lg) - 4px);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    input {
+      padding: 0.65rem 1rem;
+      font-size: 1rem;
+      color: var(--text-main);
+      background-color: var(--surface-input);
+      border: 1px solid var(--border-color);
+      border-radius: calc(var(--radius-lg) - 4px);
+      transition: var(--transition);
+      outline: none;
+
+      &:focus {
+        border-color: var(--primary-600);
+        // Resplandor azul suave similar a los efectos de sombra de tus chips
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      }
+    }
+  }
+
+  button[type="submit"] {
+    // Comportamiento visual heredado de tu .cat-chip--active
+    margin-top: 0.75rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: var(--radius-full); // O usar var(--radius-lg) para un botón más cuadrado
+    background-color: var(--primary-600);
+    color: #ffffff;
+    border: 1px solid transparent;
+    transition: var(--transition);
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover:not(:disabled) {
+      // Efecto hover extraído de tu cat-chip activo
+      background-color: var(--primary-700, #4338ca); // Asumo un tono más oscuro de azul
+      box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: var(--text-muted); // Color neutro cuando está cargando
+      box-shadow: none;
+    }
+  }
+}

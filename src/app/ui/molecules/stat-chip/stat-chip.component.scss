@@ -1,0 +1,46 @@
+.stat-chip {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-main); /* Cambiado de --gray-900 para que sea blanco en modo oscuro */
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted); /* Este ya es reactivo */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.2rem;
+  }
+
+  &--primary {
+    border-left: 4px solid var(--primary-600);
+  }
+
+  &--success {
+    border-left: 4px solid var(--success-500);
+  }
+
+  &--warning {
+    border-left: 4px solid var(--accent-500);
+  }
+
+  &--neutral {
+    border-left: 4px solid var(--text-muted); /* Cambiado de --gray-400 para mantener el contraste */
+  }
+}

@@ -1,0 +1,18 @@
+
+    <div class="search-bar">
+      <div class="search-bar__input">
+        <app-input
+          [placeholder]="placeholder()"
+          [value]="currentTerm()"
+          (valueChange)="onTermChange($event)"
+        />
+      </div>
+
+      <app-button
+        variant="primary"
+        size="md"
+        (clicked)="onSearchSubmit()"
+      >
+        Buscar
+      </app-button>
+    </div>

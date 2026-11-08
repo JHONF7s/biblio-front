@@ -1,0 +1,15 @@
+
+    @if (notif(); as n) {
+      <div class="toast" [class]="'toast--' + n.type" role="alert">
+        <span class="toast__icon">
+          @switch (n.type) {
+            @case ('success') { ✓ }
+            @case ('warning') { ⚠ }
+            @case ('error') { ✕ }
+            @default { ℹ }
+          }
+        </span>
+        <span class="toast__message">{{ n.text }}</span>
+        <button type="button" class="toast__close" (click)="close()">✕</button>
+      </div>
+    }

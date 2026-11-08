@@ -1,0 +1,64 @@
+
+    @if (isOpen()) {
+      <div class="drawer-backdrop" (click)="close()"></div>
+
+      <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+        <div class="drawer__header">
+          <div>
+            <h2 id="drawer-title" class="drawer__title">Mis Préstamos</h2>
+            <span class="drawer__subtitle">{{ totalCount() }} {{ totalCount() === 1 ? 'libro en posesión' : 'libros en posesión' }}</span>
+          </div>
+          <button type="button" class="drawer__close-btn" (click)="close()" aria-label="Cerrar panel">✕</button>
+        </div>
+
+        <div class="drawer__content">
+          @for (book of borrowedBooks(); track book.id) {
+            <div class="drawer-item">
+              <div class="drawer-item__thumb" [style.background]="book.coverGradient"></div>
+
+              <div class="drawer-item__info">
+                <span class="drawer-item__cat">{{ book.category }}</span>
+                <h4 class="drawer-item__title" (click)="goToBook(book.id)">{{ book.title }}</h4>
+                <span class="drawer-item__author">{{ book.author }}</span>
+
+                <div class="drawer-item__actions">
+                  <app-button
+                    variant="ghost"
+                    size="sm"
+                    (clicked)="goToBook(book.id)"
+                  >
+                    Detalles
+                  </app-button>
+                  <app-button
+                    variant="danger"
+                    size="sm"
+                    (clicked)="returnBook(book.id)"
+                  >
+                    Devolver
+                  </app-button>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="drawer-empty">
+              <span class="drawer-empty__icon">📖</span>
+              <p class="drawer-empty__text">Aún no tienes libros en préstamo.</p>
+              <p class="drawer-empty__sub">Explora el catálogo y pide prestado el que te interese.</p>
+            </div>
+          }
+        </div>
+
+        @if (totalCount() > 0) {
+          <div class="drawer__footer">
+            <app-button
+              variant="outline"
+              size="md"
+              [fullWidth]="true"
+              (clicked)="returnAll()"
+            >
+              Devolver todos los libros
+            </app-button>
+          </div>
+        }
+      </aside>
+    }
