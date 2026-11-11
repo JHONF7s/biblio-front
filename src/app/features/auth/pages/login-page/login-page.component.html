@@ -1,0 +1,337 @@
+<section class="auth-page page-container" aria-labelledby="auth-page-title">
+  <div class="auth-card squircle-surface">
+    <!-- Conmutador segmentado: Iniciar sesión | Crear cuenta -->
+    <div class="auth-tabs" role="tablist" aria-label="Modo de acceso">
+      <button
+        type="button"
+        role="tab"
+        class="auth-tabs__btn"
+        [class.auth-tabs__btn--active]="modoActivo() === 'login'"
+        [attr.aria-selected]="modoActivo() === 'login'"
+        data-testid="tab-login"
+        (click)="cambiarModo('login')"
+      >
+        Iniciar sesión
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="auth-tabs__btn"
+        [class.auth-tabs__btn--active]="modoActivo() === 'registro'"
+        [attr.aria-selected]="modoActivo() === 'registro'"
+        data-testid="tab-registro"
+        (click)="cambiarModo('registro')"
+      >
+        Crear cuenta
+      </button>
+    </div>
+
+    <header class="auth-card__header">
+      <h1 id="auth-page-title" class="auth-card__title">
+        {{ modoActivo() === 'login' ? 'Bienvenido de nuevo' : 'Crea tu cuenta de lector' }}
+      </h1>
+      <p class="auth-card__subtitle">
+        {{
+          modoActivo() === 'login'
+            ? 'Ingresa con tu correo registrado para gestionar tus préstamos y reservas.'
+            : 'Regístrate en segundos para solicitar préstamos de libros en línea.'
+        }}
+      </p>
+    </header>
+
+    @if (errorGeneral(); as errMsg) {
+      <div class="auth-alert" role="alert" aria-live="assertive" data-testid="auth-error-banner">
+        {{ errMsg }}
+      </div>
+    }
+
+    <!-- FORMULARIO DE INICIO DE SESIÓN -->
+    @if (modoActivo() === 'login') {
+      <form
+        class="auth-form"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmitLogin()"
+        novalidate
+        data-testid="login-form"
+      >
+        <div class="auth-field">
+          <label for="login-correo" class="auth-field__label">Correo electrónico</label>
+          <input
+            id="login-correo"
+            type="email"
+            formControlName="correo"
+            class="auth-field__input"
+            placeholder="lector@biblioteca.com"
+            maxlength="150"
+            autocomplete="username"
+            [attr.aria-invalid]="
+              loginForm.controls.correo.invalid && loginForm.controls.correo.touched
+            "
+          />
+          @if (loginForm.controls.correo.touched && loginForm.controls.correo.errors; as errs) {
+            <span class="auth-field__error" role="alert">
+              @if (errs['required']) {
+                El correo electrónico es obligatorio.
+              } @else if (errs['email']) {
+                Ingresa un formato de correo electrónico válido.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="auth-field">
+          <label for="login-password" class="auth-field__label">Contraseña</label>
+          <div class="auth-field__password-wrap">
+            <input
+              id="login-password"
+              [type]="mostrarPasswordLogin() ? 'text' : 'password'"
+              formControlName="password"
+              class="auth-field__input auth-field__input--with-toggle"
+              placeholder="Tu contraseña"
+              maxlength="60"
+              autocomplete="current-password"
+              [attr.aria-invalid]="
+                loginForm.controls.password.invalid && loginForm.controls.password.touched
+              "
+            />
+            <button
+              type="button"
+              class="auth-field__toggle-pass"
+              [attr.aria-label]="
+                mostrarPasswordLogin() ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              "
+              (click)="mostrarPasswordLogin.set(!mostrarPasswordLogin())"
+            >
+              {{ mostrarPasswordLogin() ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+          @if (loginForm.controls.password.touched && loginForm.controls.password.errors) {
+            <span class="auth-field__error" role="alert">La contraseña es obligatoria.</span>
+          }
+        </div>
+
+        <app-button
+          variant="primary"
+          size="lg"
+          type="submit"
+          [fullWidth]="true"
+          [disabled]="enviando()"
+        >
+          {{ enviando() ? 'Verificando credenciales…' : 'Ingresar' }}
+        </app-button>
+      </form>
+    } @else {
+      <!-- FORMULARIO DE REGISTRO DE USUARIO -->
+      <form
+        class="auth-form"
+        [formGroup]="registroForm"
+        (ngSubmit)="onSubmitRegistro()"
+        novalidate
+        data-testid="register-form"
+      >
+        <div class="auth-field">
+          <label for="reg-documento" class="auth-field__label">Documento de identidad</label>
+          <input
+            id="reg-documento"
+            type="text"
+            formControlName="documentoIdentidad"
+            class="auth-field__input"
+            placeholder="Ej. 1094950123"
+            maxlength="20"
+            autocomplete="off"
+            [attr.aria-invalid]="
+              registroForm.controls.documentoIdentidad.invalid &&
+              registroForm.controls.documentoIdentidad.touched
+            "
+          />
+          @if (
+            registroForm.controls.documentoIdentidad.touched &&
+            registroForm.controls.documentoIdentidad.errors;
+            as errs
+          ) {
+            <span class="auth-field__error" role="alert">
+              @if (errs['servidor']) {
+                {{ errs['servidor'] }}
+              } @else if (errs['required'] || errs['pattern']) {
+                El documento de identidad es obligatorio.
+              } @else if (errs['maxlength']) {
+                El documento no puede superar los 20 caracteres.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="auth-field">
+          <label for="reg-nombre" class="auth-field__label">Nombre completo</label>
+          <input
+            id="reg-nombre"
+            type="text"
+            formControlName="nombreCompleto"
+            class="auth-field__input"
+            placeholder="Ej. Laura Sofía Gómez"
+            maxlength="150"
+            autocomplete="name"
+            [attr.aria-invalid]="
+              registroForm.controls.nombreCompleto.invalid &&
+              registroForm.controls.nombreCompleto.touched
+            "
+          />
+          @if (
+            registroForm.controls.nombreCompleto.touched &&
+            registroForm.controls.nombreCompleto.errors;
+            as errs
+          ) {
+            <span class="auth-field__error" role="alert">
+              @if (errs['servidor']) {
+                {{ errs['servidor'] }}
+              } @else if (errs['required'] || errs['pattern']) {
+                El nombre completo es obligatorio.
+              } @else if (errs['maxlength']) {
+                El nombre completo no puede superar los 150 caracteres.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="auth-field">
+          <label for="reg-correo" class="auth-field__label">Correo electrónico</label>
+          <input
+            id="reg-correo"
+            type="email"
+            formControlName="correo"
+            class="auth-field__input"
+            placeholder="tu.correo@universidad.edu.co"
+            maxlength="150"
+            autocomplete="email"
+            [attr.aria-invalid]="
+              registroForm.controls.correo.invalid && registroForm.controls.correo.touched
+            "
+          />
+          @if (
+            registroForm.controls.correo.touched && registroForm.controls.correo.errors;
+            as errs
+          ) {
+            <span class="auth-field__error" role="alert">
+              @if (errs['servidor']) {
+                {{ errs['servidor'] }}
+              } @else if (errs['required']) {
+                El correo electrónico es obligatorio.
+              } @else if (errs['email']) {
+                Ingresa un formato de correo electrónico válido.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="auth-field">
+          <label for="reg-password" class="auth-field__label">
+            Contraseña (entre 8 y 60 caracteres)
+          </label>
+          <div class="auth-field__password-wrap">
+            <input
+              id="reg-password"
+              [type]="mostrarPasswordRegistro() ? 'text' : 'password'"
+              formControlName="password"
+              class="auth-field__input auth-field__input--with-toggle"
+              placeholder="Mínimo 8 caracteres"
+              maxlength="60"
+              autocomplete="new-password"
+              (input)="onInputPasswordRegistro($event)"
+              [attr.aria-invalid]="
+                registroForm.controls.password.invalid && registroForm.controls.password.touched
+              "
+            />
+            <button
+              type="button"
+              class="auth-field__toggle-pass"
+              [attr.aria-label]="
+                mostrarPasswordRegistro() ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              "
+              (click)="mostrarPasswordRegistro.set(!mostrarPasswordRegistro())"
+            >
+              {{ mostrarPasswordRegistro() ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+
+          @if (fortalezaPassword().nivel > 0) {
+            <div class="password-strength" aria-live="polite">
+              <div class="password-strength__bars">
+                <span
+                  class="password-strength__bar"
+                  [class.password-strength__bar--active]="fortalezaPassword().nivel >= 1"
+                ></span>
+                <span
+                  class="password-strength__bar"
+                  [class.password-strength__bar--active]="fortalezaPassword().nivel >= 2"
+                ></span>
+                <span
+                  class="password-strength__bar"
+                  [class.password-strength__bar--active]="fortalezaPassword().nivel >= 3"
+                ></span>
+              </div>
+              <span class="password-strength__label">
+                Fortaleza: {{ fortalezaPassword().etiqueta }}
+              </span>
+            </div>
+          }
+
+          @if (
+            registroForm.controls.password.touched && registroForm.controls.password.errors;
+            as errs
+          ) {
+            <span class="auth-field__error" role="alert">
+              @if (errs['servidor']) {
+                {{ errs['servidor'] }}
+              } @else if (errs['required']) {
+                La contraseña es obligatoria.
+              } @else if (errs['minlength']) {
+                La contraseña debe tener al menos 8 caracteres.
+              } @else if (errs['maxlength']) {
+                La contraseña no puede superar los 60 caracteres.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="auth-field">
+          <label for="reg-confirmar" class="auth-field__label">Confirmar contraseña</label>
+          <input
+            id="reg-confirmar"
+            [type]="mostrarPasswordRegistro() ? 'text' : 'password'"
+            formControlName="confirmarPassword"
+            class="auth-field__input"
+            placeholder="Repite tu contraseña"
+            maxlength="60"
+            autocomplete="new-password"
+            [attr.aria-invalid]="
+              registroForm.controls.confirmarPassword.touched &&
+              (registroForm.controls.confirmarPassword.invalid ||
+                registroForm.hasError('passwordsNoCoinciden'))
+            "
+          />
+          @if (registroForm.controls.confirmarPassword.touched) {
+            @if (registroForm.controls.confirmarPassword.hasError('required')) {
+              <span class="auth-field__error" role="alert">
+                Debes confirmar tu contraseña.
+              </span>
+            } @else if (registroForm.hasError('passwordsNoCoinciden')) {
+              <span class="auth-field__error" role="alert">
+                Las contraseñas no coinciden.
+              </span>
+            }
+          }
+        </div>
+
+        <app-button
+          variant="primary"
+          size="lg"
+          type="submit"
+          [fullWidth]="true"
+          [disabled]="enviando()"
+        >
+          {{ enviando() ? 'Creando cuenta…' : 'Crear cuenta e ingresar' }}
+        </app-button>
+      </form>
+    }
+  </div>
+</section>

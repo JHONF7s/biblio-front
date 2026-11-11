@@ -1,0 +1,98 @@
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: var(--gutter, 1.5rem);
+  z-index: var(--z-toast, 1100);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  font-size: 0.9rem;
+  font-weight: 500;
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 420px;
+
+  /*
+   NOTA: Los estilos base de este toast ya son excelentes para el modo oscuro.
+   Al usar fondos oscuros (700) con texto blanco (#ffffff), garantizas un alto contraste en ambos temas.
+  */
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    /* Este blanco con opacidad funciona perfecto sobre los fondos de color sólido */
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  &__message {
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  &__close {
+    background: transparent;
+    color: inherit;
+    font-size: 0.9rem;
+    opacity: 0.75;
+    padding: 0.2rem;
+    line-height: 1;
+    border-radius: 4px;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  /* Variantes de color: Se mantienen intactas porque son colores de alerta universales */
+  &--success {
+    background-color: var(--success-700);
+    color: #ffffff;
+  }
+
+  &--info {
+    background-color: var(--primary-700);
+    color: #ffffff;
+  }
+
+  &--warning {
+    background-color: var(--accent-600);
+    color: #ffffff;
+  }
+
+  &--error {
+    background-color: var(--danger-700);
+    color: #ffffff;
+  }
+
+  /* Te añado una variante neutral por si alguna vez quieres un toast que se adapte al tema actual */
+  &--neutral {
+    background-color: var(--surface-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+
+    .toast__icon {
+      background: var(--border-color);
+      color: var(--text-main);
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

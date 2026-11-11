@@ -1,0 +1,298 @@
+<div class="catalog-page page-container">
+  <!-- Backdrop móvil para el sidebar off-canvas (< 1024px) -->
+  @if (uiState.sidebarCatalogoAbierto()) {
+    <div
+      class="catalog-sidebar-backdrop"
+      (click)="uiState.establecerSidebarCatalogo(false)"
+    ></div>
+  }
+
+  <div
+    class="catalog-layout"
+    [class.catalog-layout--sidebar-closed]="!uiState.sidebarCatalogoAbierto()"
+  >
+    <!-- SIDEBAR DESPLEGABLE DE FILTROS -->
+    <aside
+      id="catalog-filters-sidebar"
+      class="catalog-sidebar"
+      [class.catalog-sidebar--open]="uiState.sidebarCatalogoAbierto()"
+      aria-label="Filtros del catálogo"
+    >
+      <div class="catalog-sidebar__top">
+        <h2 class="catalog-sidebar__heading">Filtros y búsqueda</h2>
+        <div class="catalog-sidebar__top-actions">
+          @if (chipsActivos().length > 0) {
+            <button
+              type="button"
+              class="catalog-sidebar__reset"
+              (click)="limpiarTodosLosFiltros()"
+            >
+              Limpiar todo
+            </button>
+          }
+          <button
+            type="button"
+            class="catalog-sidebar__close-mobile"
+            aria-label="Cerrar panel de filtros"
+            (click)="uiState.establecerSidebarCatalogo(false)"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. Búsqueda difusa -->
+      <div class="filter-group">
+        <label for="sidebar-fuzzy-input" class="filter-group__label">
+          Búsqueda inteligente
+        </label>
+        <input
+          id="sidebar-fuzzy-input"
+          type="search"
+          class="filter-group__input"
+          placeholder="Título, autor, género o ISBN…"
+          [ngModel]="consultaLocal()"
+          (ngModelChange)="onCambioBusquedaSidebar($event)"
+          data-testid="catalog-fuzzy-input"
+        />
+      </div>
+
+      <!-- 2. Favoritos y Disponibilidad -->
+      <div class="filter-group filter-group--toggles">
+        <label class="toggle-row">
+          <input
+            type="checkbox"
+            [checked]="soloFavoritos()"
+            (change)="alternarSoloFavoritos($any($event.target).checked)"
+            data-testid="filter-favorites-checkbox"
+          />
+          <span class="toggle-row__text">Solo mis favoritos</span>
+          <span class="toggle-row__count">{{ favoritosService.totalFavoritos() }}</span>
+        </label>
+
+        <label class="toggle-row">
+          <input
+            type="checkbox"
+            [checked]="soloDisponibles()"
+            (change)="alternarSoloDisponibles($any($event.target).checked)"
+            data-testid="filter-available-checkbox"
+          />
+          <span class="toggle-row__text">Con copias disponibles ahora</span>
+        </label>
+      </div>
+
+      <!-- 3. Géneros literarios -->
+      <details class="filter-accordion" open>
+        <summary class="filter-accordion__summary">
+          <span>Género literario</span>
+          @if (generosSeleccionados().length > 0) {
+            <span class="filter-accordion__badge">{{ generosSeleccionados().length }}</span>
+          }
+        </summary>
+        <div class="filter-accordion__content">
+          @for (gen of catalogoService.generosConConteo(); track gen.idGenero) {
+            <label class="checkbox-row">
+              <input
+                type="checkbox"
+                [checked]="generosSeleccionados().includes(gen.idGenero)"
+                (change)="alternarGenero(gen.idGenero)"
+              />
+              <span class="checkbox-row__name">{{ gen.nombreGenero }}</span>
+              <span class="checkbox-row__count">{{ gen.total }}</span>
+            </label>
+          }
+        </div>
+      </details>
+
+      <!-- 4. Autores con buscador interno -->
+      <details class="filter-accordion" open>
+        <summary class="filter-accordion__summary">
+          <span>Autor</span>
+          @if (autoresSeleccionados().length > 0) {
+            <span class="filter-accordion__badge">{{ autoresSeleccionados().length }}</span>
+          }
+        </summary>
+        <div class="filter-accordion__content">
+          <input
+            type="search"
+            class="filter-group__input filter-group__input--sm"
+            placeholder="Filtrar lista de autores…"
+            aria-label="Filtrar lista de autores"
+            [ngModel]="filtroInternoAutor()"
+            (ngModelChange)="filtroInternoAutor.set($event)"
+          />
+          <div class="author-scroll-list">
+            @for (autor of autoresFiltradosSidebar(); track autor.idAutor) {
+              <label class="checkbox-row">
+                <input
+                  type="checkbox"
+                  [checked]="autoresSeleccionados().includes(autor.idAutor)"
+                  (change)="alternarAutor(autor.idAutor)"
+                />
+                <span class="checkbox-row__name">{{ autor.nombreAutor }}</span>
+                <span class="checkbox-row__count">{{ autor.total }}</span>
+              </label>
+            } @empty {
+              <p class="filter-empty-note">Ningún autor coincide con ese filtro.</p>
+            }
+          </div>
+        </div>
+      </details>
+
+      <!-- 5. Año de publicación -->
+      <details class="filter-accordion" open>
+        <summary class="filter-accordion__summary">
+          <span>Año de publicación</span>
+        </summary>
+        <div class="filter-accordion__content">
+          <div class="year-range-inputs">
+            <div>
+              <label for="filter-year-from" class="year-range-inputs__label">Desde</label>
+              <input
+                id="filter-year-from"
+                type="number"
+                min="1"
+                max="2100"
+                class="filter-group__input filter-group__input--sm"
+                [placeholder]="'' + catalogoService.rangoAnios().min"
+                [ngModel]="anioDesde() ?? ''"
+                (ngModelChange)="onCambioAnioDesde($event)"
+              />
+            </div>
+            <div>
+              <label for="filter-year-to" class="year-range-inputs__label">Hasta</label>
+              <input
+                id="filter-year-to"
+                type="number"
+                min="1"
+                max="2100"
+                class="filter-group__input filter-group__input--sm"
+                [placeholder]="'' + catalogoService.rangoAnios().max"
+                [ngModel]="anioHasta() ?? ''"
+                (ngModelChange)="onCambioAnioHasta($event)"
+              />
+            </div>
+          </div>
+          @if (rangoAniosActivo() && catalogoService.rangoAnios().sinAnio > 0) {
+            <p class="year-range-note">
+              Se excluyen {{ catalogoService.rangoAnios().sinAnio }} títulos sin año de publicación registrado.
+            </p>
+          }
+        </div>
+      </details>
+
+      <div class="catalog-sidebar__bottom">
+        <app-button
+          variant="outline"
+          size="sm"
+          [fullWidth]="true"
+          (clicked)="limpiarTodosLosFiltros()"
+        >
+          Limpiar filtros
+        </app-button>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE RESULTADOS -->
+    <div class="catalog-results">
+      <header class="catalog-toolbar">
+        <div class="catalog-toolbar__left">
+          <button
+            type="button"
+            class="catalog-toolbar__toggle-btn"
+            [attr.aria-expanded]="uiState.sidebarCatalogoAbierto()"
+            aria-controls="catalog-filters-sidebar"
+            data-testid="catalog-sidebar-toggle"
+            (click)="uiState.alternarSidebarCatalogo()"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M3 5H17M6 10H14M9 15H11"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span>{{ uiState.sidebarCatalogoAbierto() ? 'Ocultar filtros' : 'Mostrar filtros' }}</span>
+          </button>
+
+          <div class="catalog-toolbar__title-wrap">
+            <h1 class="catalog-toolbar__title">Catálogo bibliográfico</h1>
+            <p class="catalog-toolbar__counter" aria-live="polite" data-testid="catalog-counter">
+              Mostrando {{ librosFiltrados().length }} de {{ catalogoService.libros().length }} títulos
+            </p>
+          </div>
+        </div>
+
+        <div class="catalog-toolbar__right">
+          <label for="catalog-sort-select" class="catalog-toolbar__sort-label">Ordenar por</label>
+          <select
+            id="catalog-sort-select"
+            class="catalog-toolbar__sort-select"
+            [ngModel]="ordenActivo()"
+            (ngModelChange)="onCambioOrden($event)"
+          >
+            @if (consultaActiva()) {
+              <option value="relevancia">Relevancia de búsqueda</option>
+            }
+            <option value="titulo-asc">Título (A → Z)</option>
+            <option value="titulo-desc">Título (Z → A)</option>
+            <option value="anio-desc">Año (más recientes)</option>
+            <option value="anio-asc">Año (más antiguos)</option>
+          </select>
+        </div>
+      </header>
+
+      <!-- Chips removibles de filtros activos -->
+      @if (chipsActivos().length > 0) {
+        <div class="active-chips" aria-label="Filtros aplicados">
+          @for (chip of chipsActivos(); track chip.id) {
+            <span class="filter-chip">
+              <span>{{ chip.etiqueta }}</span>
+              <button
+                type="button"
+                class="filter-chip__remove"
+                [attr.aria-label]="'Quitar filtro ' + chip.etiqueta"
+                (click)="chip.accionRemover()"
+              >
+                ✕
+              </button>
+            </span>
+          }
+          <button
+            type="button"
+            class="active-chips__clear"
+            (click)="limpiarTodosLosFiltros()"
+          >
+            Limpiar todos
+          </button>
+        </div>
+      }
+
+      @if (catalogoService.cargando()) {
+        <div class="catalog-skeleton-grid" aria-live="polite">
+          @for (n of [1, 2, 3, 4, 5, 6]; track n) {
+            <div class="catalog-skeleton-card"></div>
+          }
+        </div>
+      } @else if (catalogoService.error(); as msgError) {
+        <div class="catalog-error-state" role="alert">
+          <h2>Error al consultar el catálogo</h2>
+          <p>{{ msgError }}</p>
+          <app-button variant="primary" (clicked)="catalogoService.refrescar()">
+            Reintentar
+          </app-button>
+        </div>
+      } @else {
+        <app-book-grid
+          [libros]="librosFiltrados()"
+          [favoritosIds]="favoritosService.favoritosIds()"
+          (pedirPrestado)="onPedirPrestado($event)"
+          (verDetalles)="onVerDetalle($event)"
+          (alternarFavorito)="onAlternarFavorito($event)"
+          (limpiarFiltros)="limpiarTodosLosFiltros()"
+        />
+      }
+    </div>
+  </div>
+</div>

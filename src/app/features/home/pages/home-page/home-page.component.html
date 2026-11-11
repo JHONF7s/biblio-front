@@ -1,0 +1,136 @@
+<div class="home-page page-container">
+  <!-- Hero orientado al lector (F-20) -->
+  <section class="home-hero" aria-labelledby="home-hero-title">
+    <div class="home-hero__content">
+      <span class="home-hero__eyebrow">Colección abierta · Reserva en línea</span>
+      <h1 id="home-hero-title" class="home-hero__title">
+        Tu próxima lectura académica o literaria, lista para reservar
+      </h1>
+      <p class="home-hero__subtitle">
+        Consulta en tiempo real la disponibilidad de ejemplares físicos, explora por género o autor
+        y programa tus préstamos eligiendo el rango exacto de fechas.
+      </p>
+
+      <div class="home-hero__actions">
+        <a routerLink="/catalog" class="home-hero__btn home-hero__btn--primary">
+          Explorar catálogo
+        </a>
+        @if (!authService.autenticado()) {
+          <a
+            [routerLink]="['/login']"
+            [queryParams]="{ modo: 'registro' }"
+            class="home-hero__btn home-hero__btn--outline"
+          >
+            Crear cuenta
+          </a>
+        } @else {
+          <a routerLink="/loans" class="home-hero__btn home-hero__btn--outline">
+            Ver mis préstamos
+          </a>
+        }
+      </div>
+    </div>
+
+    <!-- Indicadores reales obtenidos de la API (R-4) -->
+    <div class="home-hero__stats" aria-label="Indicadores reales del catálogo">
+      <app-stat-chip
+        label="Títulos en catálogo"
+        [value]="catalogoService.estadisticas().totalTitulos"
+        variant="primary"
+      />
+      <app-stat-chip
+        label="Copias disponibles ahora"
+        [value]="catalogoService.estadisticas().copiasDisponiblesAhora"
+        variant="success"
+      />
+      <app-stat-chip
+        label="Ejemplares registrados"
+        [value]="catalogoService.estadisticas().totalEjemplares"
+        variant="neutral"
+      />
+      @if (authService.autenticado()) {
+        <app-stat-chip
+          label="Mis préstamos activos"
+          [value]="reservasService.conteoActivas()"
+          variant="warning"
+        />
+      }
+    </div>
+  </section>
+
+  <!-- Estado de carga o error del catálogo -->
+  @if (catalogoService.cargando()) {
+    <section class="home-section" aria-live="polite">
+      <div class="home-skeleton-grid">
+        @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+          <div class="home-skeleton-card"></div>
+        }
+      </div>
+    </section>
+  } @else if (catalogoService.error(); as mensajeError) {
+    <section class="home-state home-state--error" role="alert">
+      <h2>No pudimos conectar con el catálogo</h2>
+      <p>{{ mensajeError }}</p>
+      <app-button variant="primary" (clicked)="catalogoService.refrescar()">
+        Reintentar conexión
+      </app-button>
+    </section>
+  } @else {
+    <!-- Explora por género (conteos reales) -->
+    @if (catalogoService.generosConConteo().length > 0) {
+      <section class="home-section" aria-labelledby="home-genres-title">
+        <header class="home-section__header">
+          <div>
+            <h2 id="home-genres-title" class="home-section__title">Explora por género</h2>
+            <p class="home-section__subtitle">
+              Accede directamente a cada área temática con su número real de obras habilitadas.
+            </p>
+          </div>
+        </header>
+
+        <div class="genre-grid">
+          @for (genero of catalogoService.generosConConteo(); track genero.idGenero) {
+            <button
+              type="button"
+              class="genre-tile"
+              (click)="onExplorarGenero(genero.idGenero)"
+            >
+              <span class="genre-tile__name">{{ genero.nombreGenero }}</span>
+              <span class="genre-tile__count">
+                {{ genero.total === 1 ? '1 título' : genero.total + ' títulos' }}
+              </span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Disponibles ahora (primeros 8–12 libros con copias disponibles) -->
+    <section class="home-section" aria-labelledby="home-available-title">
+      <header class="home-section__header">
+        <div>
+          <h2 id="home-available-title" class="home-section__title">Disponibles ahora</h2>
+          <p class="home-section__subtitle">
+            Obras con ejemplares libres en este instante para préstamo inmediato.
+          </p>
+        </div>
+
+        <a routerLink="/catalog" class="home-section__link">
+          Ver todo el catálogo ({{ catalogoService.estadisticas().totalTitulos }}) →
+        </a>
+      </header>
+
+      <app-book-grid
+        [libros]="catalogoService.disponiblesAhora()"
+        [favoritosIds]="favoritosService.favoritosIds()"
+        tituloVacio="No hay títulos disponibles en este instante"
+        descripcionVacia="Consulta el catálogo completo para revisar próximas devoluciones o reservar en fechas futuras."
+        textoAccionVacia="Ir al catálogo completo"
+        (pedirPrestado)="onPedirPrestado($event)"
+        (verDetalles)="onVerDetalleLibro($event)"
+        (alternarFavorito)="onAlternarFavorito($event)"
+        (limpiarFiltros)="irACatalogoCompleto()"
+      />
+    </section>
+  }
+</div>

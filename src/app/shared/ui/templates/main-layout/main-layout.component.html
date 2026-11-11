@@ -1,0 +1,62 @@
+<div class="layout">
+  <app-header
+    [enInicio]="enInicio()"
+    [enCatalogo]="enCatalogo()"
+    [autenticado]="authService.autenticado()"
+    [nombreUsuario]="authService.nombre()"
+    [correoUsuario]="authService.correo()"
+    [rolUsuario]="authService.rol()"
+    [prestamosActivos]="reservasService.conteoActivas()"
+    [consultaInicial]="consultaUrlQ()"
+    (irInicio)="irAlInicio()"
+    (buscar)="onBuscarDesdeHeader($event)"
+    (cambioBusquedaVivo)="onCambioBusquedaVivo($event)"
+    (abrirBusquedaAvanzada)="onAbrirBusquedaAvanzada()"
+    (abrirPrestamos)="onAbrirMisPrestamos()"
+    (cerrarSesion)="onCerrarSesion()"
+  />
+
+  <app-theme-toggle />
+
+  <main id="contenido" class="layout__main" tabindex="-1">
+    <router-outlet />
+  </main>
+
+  <app-loan-drawer
+    [abierto]="uiState.panelPrestamosAbierto()"
+    [expandiendo]="uiState.expandiendoPanelPrestamos()"
+    [reservasActivas]="reservasService.activas()"
+    [cargando]="reservasService.cargando()"
+    [error]="reservasService.error()"
+    [cancelandoId]="cancelandoReservaId()"
+    (cerrar)="uiState.cerrarPanelPrestamos()"
+    (expandir)="onIniciarExpansionPanel()"
+    (expansionTerminada)="onExpansionPanelTerminada()"
+    (cancelarReserva)="onCancelarReservaDesdePanel($event)"
+    (verLibro)="onVerLibroDesdePanel($event)"
+    (irCatalogo)="onIrCatalogoDesdePanel()"
+    (reintentar)="reservasService.cargarMisReservas()"
+  />
+
+  <app-reserva-dialog
+    [libro]="uiState.libroParaReservar()"
+    [enviando]="enviandoReserva()"
+    [errorServidor]="errorReserva()"
+    [disponibilidad]="disponibilidadModal()"
+    [consultandoDisponibilidad]="consultandoDisponibilidad()"
+    (cerrar)="onCerrarModalReserva()"
+    (consultarDisponibilidad)="onConsultarDisponibilidadModal($event)"
+    (confirmar)="onConfirmarReservaModal($event)"
+  />
+
+  <app-toast />
+
+  <app-site-footer
+    [enInicio]="enInicio()"
+    [autenticado]="authService.autenticado()"
+    (irInicio)="irAlInicio()"
+    (abrirPrestamos)="onAbrirMisPrestamos()"
+    (abrirBusquedaAvanzada)="onAbrirBusquedaAvanzada()"
+    (cerrarSesion)="onCerrarSesion()"
+  />
+</div>

@@ -1,0 +1,115 @@
+<section class="book-detail page-container" aria-labelledby="book-detail-title">
+  <div class="book-detail__nav">
+    <button type="button" class="book-detail__back-btn" (click)="volverAlCatalogo()">
+      ← Volver al catálogo
+    </button>
+  </div>
+
+  @if (cargando() && !libro()) {
+    <div class="book-detail__skeleton" aria-live="polite"></div>
+  } @else if (noEncontrado() || !libro()) {
+    <div class="book-detail__not-found" role="alert" data-testid="book-not-found">
+      <h1 id="book-detail-title" class="book-detail__not-found-title">
+        Libro no encontrado
+      </h1>
+      <p class="book-detail__not-found-desc">
+        El título solicitado no existe en el catálogo o se encuentra inhabilitado actualmente.
+      </p>
+      <a routerLink="/catalog" class="book-detail__catalog-link">Ir al catálogo completo</a>
+    </div>
+  } @else if (libro(); as item) {
+    <article class="book-detail__card squircle-surface">
+      <div class="book-detail__cover" [style.background]="portada().gradiente">
+        <div class="book-detail__cover-spine" aria-hidden="true"></div>
+        <span class="book-detail__cover-initials" [style.color]="portada().acento">
+          {{ portada().iniciales }}
+        </span>
+        <div class="book-detail__cover-bottom">
+          <span class="book-detail__cover-genre">{{ item.nombreGenero }}</span>
+          <h2 class="book-detail__cover-title">{{ item.titulo }}</h2>
+          <p class="book-detail__cover-authors">{{ nombresAutores() }}</p>
+        </div>
+      </div>
+
+      <div class="book-detail__info">
+        <div class="book-detail__top-row">
+          <app-badge [text]="item.nombreGenero" variant="primary" />
+          <button
+            type="button"
+            class="book-detail__fav-btn"
+            [class.book-detail__fav-btn--active]="esFavorito()"
+            [attr.aria-pressed]="esFavorito()"
+            (click)="onAlternarFavorito()"
+          >
+            <span>{{ esFavorito() ? '♥ En mis favoritos' : '♡ Guardar en favoritos' }}</span>
+          </button>
+        </div>
+
+        <h1 id="book-detail-title" class="book-detail__title">{{ item.titulo }}</h1>
+        <p class="book-detail__authors">Por {{ nombresAutores() }}</p>
+
+        <dl class="book-detail__specs">
+          <div class="book-detail__spec-item">
+            <dt>Código ISBN</dt>
+            <dd>{{ item.isbn }}</dd>
+          </div>
+          <div class="book-detail__spec-item">
+            <dt>Género literario</dt>
+            <dd>
+              <a
+                [routerLink]="['/catalog']"
+                [queryParams]="{ generos: item.idGenero }"
+                class="book-detail__spec-link"
+              >
+                {{ item.nombreGenero }}
+              </a>
+            </dd>
+          </div>
+          <div class="book-detail__spec-item">
+            <dt>Año de publicación</dt>
+            <dd>{{ item.anioPublicacion ?? 'No registrado' }}</dd>
+          </div>
+          <div class="book-detail__spec-item">
+            <dt>Inventario total</dt>
+            <dd>
+              {{ item.totalEjemplares }}
+              {{ item.totalEjemplares === 1 ? 'ejemplar físico' : 'ejemplares físicos' }}
+            </dd>
+          </div>
+          <div class="book-detail__spec-item">
+            <dt>Disponibilidad actual</dt>
+            <dd>
+              @if (item.ejemplaresDisponibles > 0) {
+                <span class="book-detail__avail book-detail__avail--ok">
+                  {{ item.ejemplaresDisponibles }} disponibles ahora
+                </span>
+              } @else {
+                <span class="book-detail__avail book-detail__avail--warn">
+                  0 disponibles en este instante (puedes consultar fechas futuras)
+                </span>
+              }
+            </dd>
+          </div>
+        </dl>
+
+        <div class="book-detail__actions">
+          <app-button
+            variant="primary"
+            size="lg"
+            (clicked)="onPedirPrestado()"
+          >
+            Pedir prestado (Reservar por rango de fechas)
+          </app-button>
+
+          <app-button
+            variant="outline"
+            size="lg"
+            (clicked)="volverAlCatalogo()"
+          >
+            Volver al catálogo
+          </app-button>
+        </div>
+      </div>
+    </article>
+  }
+</section>
