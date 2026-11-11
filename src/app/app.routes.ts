@@ -10,18 +10,18 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./ui/pages/login-page/login-page.component').then((m) => m.LoginPageComponent)
+      import('./features/auth/pages/login-page/login-page.component').then((m) => m.LoginPageComponent)
   },
   {
     path: 'home',
     loadComponent: () =>
-      import('./ui/pages/home-page/home-page.component').then((m) => m.HomePageComponent)
+      import('./features/home/pages/home-page/home-page.component').then((m) => m.HomePageComponent)
 
   },
   {
     path: 'book/:id',
     loadComponent: () =>
-      import('./ui/pages/book-detail-page/book-detail-page.component').then(
+      import('./features/catalog/pages/book-detail-page/book-detail-page.component').then(
         (m) => m.BookDetailPageComponent
       )
   },

@@ -1,10 +1,10 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { LibraryService } from '../../../core/services/library.service';
-import { MainLayoutComponent } from '../../templates/main-layout/main-layout.component';
-import { SearchBarComponent } from '../../molecules/search-bar/search-bar.component';
-import { StatChipComponent } from '../../molecules/stat-chip/stat-chip.component';
-import { BookGridComponent } from '../../organisms/book-grid/book-grid.component';
+import { LibraryService } from '../../../../core/services/library.service';
+import { MainLayoutComponent } from '../../../../shared/ui/templates/main-layout/main-layout.component';
+import { SearchBarComponent } from '../../../../shared/ui/molecules/search-bar/search-bar.component';
+import { StatChipComponent } from '../../../../shared/ui/molecules/stat-chip/stat-chip.component';
+import { BookGridComponent } from '../../../../shared/ui/organisms/book-grid/book-grid.component';
 
 @Component({
   selector: 'app-home-page',

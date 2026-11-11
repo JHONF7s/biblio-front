@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { LibraryService } from '../../../core/services/library.service';
+import { LibraryService } from '../../../../core/services/library.service';
 import { ButtonComponent } from '../../atoms/button/button.component';
 
 @Component({

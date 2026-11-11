@@ -1,9 +1,9 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { LibraryService } from '../../../core/services/library.service';
-import { MainLayoutComponent } from '../../templates/main-layout/main-layout.component';
-import { BadgeComponent } from '../../atoms/badge/badge.component';
-import { ButtonComponent } from '../../atoms/button/button.component';
+import { LibraryService } from '../../../../core/services/library.service';
+import { MainLayoutComponent } from '../../../../shared/ui/templates/main-layout/main-layout.component';
+import { BadgeComponent } from '../../../../shared/ui/atoms/badge/badge.component';
+import { ButtonComponent } from '../../../../shared/ui/atoms/button/button.component';
 
 @Component({
   selector: 'app-book-detail-page',

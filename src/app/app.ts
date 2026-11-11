@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ThemeService } from '../app/core/services/theme.service';
-import { ButtonComponent } from './ui/atoms/button/button.component';
+import { ThemeService } from './core/services/theme.service';
+import { ButtonComponent } from './shared/ui/atoms/button/button.component';
 
 @Component({
   selector: 'app-root',

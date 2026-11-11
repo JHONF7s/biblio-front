@@ -1,5 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
-import { Book } from '../../../core/models/book.model';
+import { Book } from '../../../../core/models/book.model';
 import { BadgeComponent } from '../../atoms/badge/badge.component';
 import { ButtonComponent } from '../../atoms/button/button.component';
 
