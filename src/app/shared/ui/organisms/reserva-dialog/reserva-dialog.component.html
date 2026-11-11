@@ -1,0 +1,123 @@
+@if (libro(); as item) {
+  <div
+    class="reserva-backdrop"
+    role="presentation"
+    (click)="!enviando() && cerrar.emit()"
+  >
+    <div
+      class="reserva-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reserva-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="reserva-dialog__header">
+        <div>
+          <span class="reserva-dialog__eyebrow">Solicitud de préstamo</span>
+          <h2 id="reserva-dialog-title" class="reserva-dialog__title">
+            {{ item.titulo }}
+          </h2>
+          <p class="reserva-dialog__subtitle">
+            ISBN {{ item.isbn }} · {{ item.nombreGenero }}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="reserva-dialog__close"
+          aria-label="Cerrar ventana de préstamo"
+          [disabled]="enviando()"
+          (click)="cerrar.emit()"
+        >
+          ✕
+        </button>
+      </header>
+
+      <form class="reserva-dialog__form" (submit)="onSubmit($event)" novalidate>
+        <div class="reserva-dialog__field">
+          <label for="reserva-fecha-inicio" class="reserva-dialog__label">
+            Fecha y hora de inicio del préstamo
+          </label>
+          <input
+            id="reserva-fecha-inicio"
+            type="datetime-local"
+            name="fechaInicio"
+            class="reserva-dialog__input"
+            required
+            [ngModel]="fechaInicio()"
+            (ngModelChange)="onCambioFechaInicio($event)"
+          />
+          <span class="reserva-dialog__hint">
+            Debe ser una fecha futura. Recuerda que puedes cancelar sin costo hasta 24 h antes del inicio.
+          </span>
+        </div>
+
+        <div class="reserva-dialog__field">
+          <label for="reserva-fecha-entrega" class="reserva-dialog__label">
+            Fecha y hora de entrega prevista
+          </label>
+          <input
+            id="reserva-fecha-entrega"
+            type="datetime-local"
+            name="fechaEntrega"
+            class="reserva-dialog__input"
+            required
+            [ngModel]="fechaEntrega()"
+            (ngModelChange)="onCambioFechaEntrega($event)"
+          />
+        </div>
+
+        @if (consultandoDisponibilidad()) {
+          <div class="reserva-dialog__availability reserva-dialog__availability--loading" aria-live="polite">
+            Consultando disponibilidad para la fecha seleccionada…
+          </div>
+        } @else if (disponibilidad(); as disp) {
+          <div
+            class="reserva-dialog__availability"
+            [class.reserva-dialog__availability--ok]="disp.disponible"
+            [class.reserva-dialog__availability--empty]="!disp.disponible"
+            aria-live="polite"
+          >
+            @if (disp.disponible) {
+              <span>✓ {{ disp.ejemplaresDisponibles }} {{ disp.ejemplaresDisponibles === 1 ? 'ejemplar disponible' : 'ejemplares disponibles' }} para esa fecha de inicio.</span>
+            } @else {
+              <span>⚠ No hay ejemplares libres en ese instante. Prueba otro rango de fechas.</span>
+            }
+          </div>
+        }
+
+        <ng-content />
+
+        @if (errorValidacion(); as errLocal) {
+          <div class="reserva-dialog__alert" role="alert" aria-live="polite">
+            {{ errLocal }}
+          </div>
+        }
+
+        @if (errorServidor(); as errApi) {
+          <div class="reserva-dialog__alert" role="alert" aria-live="assertive">
+            {{ errApi }}
+          </div>
+        }
+
+        <footer class="reserva-dialog__footer">
+          <app-button
+            variant="outline"
+            type="button"
+            [disabled]="enviando()"
+            (clicked)="cerrar.emit()"
+          >
+            Cancelar
+          </app-button>
+
+          <app-button
+            variant="primary"
+            type="submit"
+            [disabled]="enviando() || !!errorValidacion()"
+          >
+            {{ enviando() ? 'Registrando reserva…' : 'Confirmar préstamo' }}
+          </app-button>
+        </footer>
+      </form>
+    </div>
+  </div>
+}

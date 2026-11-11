@@ -1,32 +1,183 @@
+<a href="#contenido" class="skip-link">Saltar al contenido principal</a>
 
-    <header class="header">
-      <div class="header__container">
-        <!-- Logo / Brand -->
-        <a routerLink="/" class="header__brand">
-          <div class="header__logo-icon">📚</div>
-          <div class="header__brand-text">
-            <span class="header__brand-title">BiblioAngular</span>
-            <span class="header__brand-subtitle">Atomic Design & Signals</span>
-          </div>
+<header role="banner" class="site-header">
+  <div class="page-container site-header__inner">
+    <!-- Mitad izquierda (~50%): Marca única + Barra de búsqueda amplia con Búsqueda avanzada -->
+    <div class="site-header__left">
+      <app-brand [enInicio]="enInicio()" (navegarInicio)="irInicio.emit()" />
+
+      <div class="site-header__search-area" [class.site-header__search-area--open]="busquedaMovilAbierta()">
+        <form class="site-header__search-form" role="search" (submit)="onSubmitBusqueda($event)">
+          <label for="header-search-input" class="sr-only">
+            Buscar en el catálogo por título, autor, género o ISBN
+          </label>
+          <input
+            #searchInput
+            id="header-search-input"
+            type="search"
+            class="site-header__search-input"
+            placeholder="Buscar por título, autor o ISBN… (Atajo /)"
+            autocomplete="off"
+            [ngModel]="terminoBusqueda()"
+            name="q"
+            (ngModelChange)="onInputBusqueda($event)"
+          />
+          @if (terminoBusqueda()) {
+            <button
+              type="button"
+              class="site-header__search-clear"
+              aria-label="Limpiar búsqueda"
+              (click)="limpiarBusqueda()"
+            >
+              ✕
+            </button>
+          }
+          <button
+            type="submit"
+            class="site-header__search-submit"
+            aria-label="Ejecutar búsqueda en el catálogo"
+            title="Buscar en el catálogo"
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2" />
+              <path d="M13.5 13.5L17.5 17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </form>
+
+        <button
+          type="button"
+          class="site-header__advanced-link"
+          (click)="onClickBusquedaAvanzada()"
+        >
+          Búsqueda avanzada
+        </button>
+      </div>
+    </div>
+
+    <!-- Mitad derecha (~50%): Navegación principal y sesión -->
+    <div class="site-header__right">
+      <!-- Controles móviles (< 1024px) -->
+      <div class="site-header__mobile-triggers">
+        <button
+          type="button"
+          class="site-header__icon-btn"
+          [attr.aria-expanded]="busquedaMovilAbierta()"
+          aria-label="Mostrar buscador"
+          (click)="alternarBusquedaMovil()"
+        >
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2" />
+            <path d="M13.5 13.5L17.5 17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          class="site-header__icon-btn"
+          [attr.aria-expanded]="menuMovilAbierto()"
+          aria-label="Abrir menú de navegación"
+          (click)="alternarMenuMovil()"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            @if (menuMovilAbierto()) {
+              <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            } @else {
+              <path d="M4 7H20M4 12H20M4 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            }
+          </svg>
+        </button>
+      </div>
+
+      <nav
+        aria-label="Principal"
+        class="site-header__nav"
+        [class.site-header__nav--open]="menuMovilAbierto()"
+      >
+        <a
+          routerLink="/catalog"
+          routerLinkActive="site-header__link--active"
+          class="site-header__link"
+          (click)="menuMovilAbierto.set(false)"
+        >
+          Catálogo
         </a>
 
-        <!-- Navigation Actions -->
-        <nav class="header__actions">
-          <a routerLink="/" class="header__link" routerLinkActive="header__link--active" [routerLinkActiveOptions]="{ exact: true }">
-            Catálogo
-          </a>
-
-          <!-- Loan Cart Trigger Button -->
-          <app-button
-            variant="outline"
-            size="md"
-            (clicked)="onOpenLoans()"
-          >
-            <span>Mis Préstamos</span>
-            <span class="header__badge-count" [class.header__badge-count--active]="loansCount() > 0">
-              {{ loansCount() }}
+        <button
+          type="button"
+          class="site-header__link site-header__loans-btn"
+          data-testid="header-loans-btn"
+          (click)="onClickMisPrestamos()"
+        >
+          <span>Mis préstamos</span>
+          @if (autenticado()) {
+            <span
+              class="site-header__badge"
+              [class.site-header__badge--active]="prestamosActivos() > 0"
+              [attr.aria-label]="prestamosActivos() + ' préstamos activos'"
+            >
+              {{ prestamosActivos() }}
             </span>
-          </app-button>
-        </nav>
-      </div>
-    </header>
+          }
+        </button>
+
+        @if (!autenticado()) {
+          <a
+            routerLink="/login"
+            class="site-header__cta"
+            data-testid="header-login-link"
+            (click)="menuMovilAbierto.set(false)"
+          >
+            Iniciar sesión
+          </a>
+        } @else {
+          <div class="site-header__user-menu">
+            <button
+              type="button"
+              class="site-header__user-trigger"
+              data-testid="header-user-trigger"
+              [attr.aria-expanded]="menuUsuarioAbierto()"
+              aria-haspopup="menu"
+              (click)="alternarMenuUsuario()"
+            >
+              <span class="site-header__avatar" aria-hidden="true">{{ obtenerIniciales() }}</span>
+              <span class="site-header__user-name">{{ nombreUsuario() }}</span>
+              <svg class="site-header__chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            @if (menuUsuarioAbierto()) {
+              <div class="site-header__dropdown" role="menu" aria-label="Menú de cuenta de usuario">
+                <div class="site-header__dropdown-header">
+                  <p class="site-header__dropdown-name">{{ nombreUsuario() }}</p>
+                  <p class="site-header__dropdown-email">{{ correoUsuario() }}</p>
+                  <span class="site-header__role-chip">{{ rolUsuario() }}</span>
+                </div>
+                <div class="site-header__dropdown-actions">
+                  <a
+                    routerLink="/loans"
+                    role="menuitem"
+                    class="site-header__dropdown-item"
+                    (click)="menuUsuarioAbierto.set(false); menuMovilAbierto.set(false)"
+                  >
+                    Gestionar mis préstamos
+                  </a>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    class="site-header__dropdown-item site-header__dropdown-item--danger"
+                    data-testid="header-logout-btn"
+                    (click)="onConfirmarLogout()"
+                  >
+                    Cerrar sesión
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </nav>
+    </div>
+  </div>
+</header>

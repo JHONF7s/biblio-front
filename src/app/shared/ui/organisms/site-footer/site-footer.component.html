@@ -1,0 +1,135 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="page-container site-footer__grid">
+    <!-- Columna 1: Marca y descripción -->
+    <div class="site-footer__col">
+      <app-brand
+        [enInicio]="enInicio()"
+        variante="footer"
+        (navegarInicio)="irInicio.emit()"
+      />
+      <p class="site-footer__desc">
+        {{ config.descripcionFooter }}
+      </p>
+    </div>
+
+    <!-- Columna 2: Navegación directa y funcional -->
+    <div class="site-footer__col">
+      <h2 class="site-footer__heading">Navegación directa</h2>
+      <ul class="site-footer__links">
+        <li>
+          <a routerLink="/" class="site-footer__link">Inicio</a>
+        </li>
+        <li>
+          <a routerLink="/catalog" class="site-footer__link">Catálogo bibliográfico</a>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="site-footer__link site-footer__link--btn"
+            (click)="abrirBusquedaAvanzada.emit()"
+          >
+            Búsqueda avanzada y filtros
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            class="site-footer__link site-footer__link--btn"
+            (click)="abrirPrestamos.emit()"
+          >
+            Mis préstamos activos
+          </button>
+        </li>
+        @if (!autenticado()) {
+          <li>
+            <a routerLink="/login" class="site-footer__link">Iniciar sesión</a>
+          </li>
+          <li>
+            <a
+              [routerLink]="['/login']"
+              [queryParams]="{ modo: 'registro' }"
+              class="site-footer__link"
+            >
+              Crear cuenta de lector
+            </a>
+          </li>
+        } @else {
+          <li>
+            <a routerLink="/loans" class="site-footer__link">Historial completo de préstamos</a>
+          </li>
+          <li>
+            <button
+              type="button"
+              class="site-footer__link site-footer__link--btn"
+              (click)="cerrarSesion.emit()"
+            >
+              Cerrar sesión
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <!-- Columna 3: Recomendaciones reales alineadas con las reglas de negocio -->
+    <div class="site-footer__col">
+      <h2 class="site-footer__heading">Normas de préstamo y uso</h2>
+      <ul class="site-footer__recommendations">
+        @for (item of config.recomendaciones; track item) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+    </div>
+
+    <!-- Columna 4: Canales digitales y contacto condicional (D-12) -->
+    <div class="site-footer__col">
+      <h2 class="site-footer__heading">Servicios en línea</h2>
+      <p class="site-footer__service-note">
+        Plataforma de autogestión bibliotecaria con verificación de inventario por rango de fecha y hora.
+      </p>
+
+      @if (tieneContactoExplicito()) {
+        <ul class="site-footer__contact">
+          @if (config.contacto.direccion) {
+            <li>{{ config.contacto.direccion }}</li>
+          }
+          @if (config.contacto.correo) {
+            <li>{{ config.contacto.correo }}</li>
+          }
+          @if (config.contacto.telefono) {
+            <li>{{ config.contacto.telefono }}</li>
+          }
+          @if (config.contacto.horario) {
+            <li>{{ config.contacto.horario }}</li>
+          }
+        </ul>
+      }
+
+      @if (config.redesSociales.length > 0) {
+        <div class="site-footer__socials">
+          @for (red of config.redesSociales; track red.nombre) {
+            <a
+              [href]="red.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              [attr.aria-label]="red.nombre"
+              class="site-footer__social-link"
+            >
+              {{ red.nombre }}
+            </a>
+          }
+        </div>
+      }
+
+      <div class="site-footer__cta-box">
+        <a routerLink="/catalog" class="site-footer__cta-btn">Explorar colección</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="site-footer__bottom">
+    <div class="page-container site-footer__bottom-inner">
+      <p>© {{ anioActual }} {{ config.nombre }} — {{ config.subtitulo }}.</p>
+      <p class="site-footer__bottom-meta">Consulta pública · Reservas autenticadas</p>
+    </div>
+  </div>
+</footer>
