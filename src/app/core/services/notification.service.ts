@@ -1,17 +1,14 @@
-import { Injectable, signal } from '@angular/core';
-import { NotificationMessage } from '../models/book.model';
+import { Service, signal } from '@angular/core';
+import { NotificationMessage, TipoNotificacion } from '../models/notificacion.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class NotificationService {
   private readonly _activeNotification = signal<NotificationMessage | null>(null);
-  private timeoutId: any = null;
+  private timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  // Read-only signal exposure for consumers (encapsulation)
   readonly activeNotification = this._activeNotification.asReadonly();
 
-  show(text: string, type: 'success' | 'info' | 'warning' | 'error' = 'info', durationMs = 3500): void {
+  show(text: string, type: TipoNotificacion = 'info', durationMs = 3500): void {
     if (this.timeoutId) {
       clearTimeout(this.timeoutId);
     }
