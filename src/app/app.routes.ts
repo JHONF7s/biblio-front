@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { authGuard, authMatchGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { MainLayoutComponent } from './shared/ui/templates/main-layout/main-layout.component';
@@ -49,7 +49,7 @@ export const routes: Routes = [
       },
       {
         path: 'book/:id',
-        redirectTo: (route: ActivatedRouteSnapshot) => `/catalog/${route.params['id']}`,
+        redirectTo: (route) => `/catalog/${route.params['id']}`,
         pathMatch: 'full'
       },
       {

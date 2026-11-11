@@ -1,0 +1,274 @@
+<section
+  class="loans-page page-container"
+  [class.loans-page--from-expansion]="vieneDeExpansion()"
+  aria-labelledby="loans-page-title"
+>
+  <header class="loans-header">
+    <div class="loans-header__left">
+      <button type="button" class="loans-header__back" (click)="volver()">
+        ← Volver
+      </button>
+      <div>
+        <h1 id="loans-page-title" class="loans-header__title">Mis Préstamos</h1>
+        <p class="loans-header__subtitle">
+          Gestiona tus reservas activas, revisa las fechas de entrega y consulta tu historial completo.
+        </p>
+      </div>
+    </div>
+
+    <div class="loans-header__actions">
+      <app-button
+        variant="outline"
+        size="sm"
+        [disabled]="reservasService.cargando()"
+        (clicked)="reservasService.cargarMisReservas()"
+      >
+        {{ reservasService.cargando() ? 'Actualizando…' : 'Actualizar' }}
+      </app-button>
+      <a routerLink="/catalog" class="loans-header__catalog-cta">
+        Reservar otro libro
+      </a>
+    </div>
+  </header>
+
+  <!-- Tarjetas de resumen reales -->
+  <div class="loans-summary" aria-label="Resumen de reservas">
+    <app-stat-chip
+      label="Reservas activas"
+      [value]="reservasService.activas().length"
+      variant="success"
+    />
+    <app-stat-chip
+      label="Finalizadas"
+      [value]="reservasService.finalizadas().length"
+      variant="primary"
+    />
+    <app-stat-chip
+      label="Canceladas"
+      [value]="reservasService.canceladas().length"
+      variant="neutral"
+    />
+    <div class="loans-summary__next-card">
+      <span class="loans-summary__next-label">Próxima fecha de entrega</span>
+      <strong class="loans-summary__next-value">
+        @if (reservasService.proximaEntrega(); as prox) {
+          {{ prox | date: 'd MMM y, h:mm a' }}
+        } @else {
+          Sin entregas pendientes
+        }
+      </strong>
+    </div>
+  </div>
+
+  <!-- Regla de negocio informativa -->
+  <div class="loans-rule-banner" role="note">
+    <strong>Política de cancelación:</strong> Puedes cancelar cualquier reserva activa hasta
+    <strong>24 horas antes</strong> de su fecha y hora de inicio programada.
+  </div>
+
+  <!-- Barra de filtros, búsqueda y ordenamiento -->
+  <div class="loans-toolbar">
+    <div class="loans-tabs" role="tablist" aria-label="Filtrar por estado de reserva">
+      <button
+        type="button"
+        role="tab"
+        class="loans-tabs__btn"
+        [class.loans-tabs__btn--active]="filtroEstado() === 'TODAS'"
+        [attr.aria-selected]="filtroEstado() === 'TODAS'"
+        (click)="filtroEstado.set('TODAS')"
+      >
+        Todas ({{ reservasService.reservas().length }})
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="loans-tabs__btn"
+        [class.loans-tabs__btn--active]="filtroEstado() === 'ACTIVA'"
+        [attr.aria-selected]="filtroEstado() === 'ACTIVA'"
+        (click)="filtroEstado.set('ACTIVA')"
+      >
+        Activas ({{ reservasService.activas().length }})
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="loans-tabs__btn"
+        [class.loans-tabs__btn--active]="filtroEstado() === 'FINALIZADA'"
+        [attr.aria-selected]="filtroEstado() === 'FINALIZADA'"
+        (click)="filtroEstado.set('FINALIZADA')"
+      >
+        Finalizadas ({{ reservasService.finalizadas().length }})
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="loans-tabs__btn"
+        [class.loans-tabs__btn--active]="filtroEstado() === 'CANCELADA'"
+        [attr.aria-selected]="filtroEstado() === 'CANCELADA'"
+        (click)="filtroEstado.set('CANCELADA')"
+      >
+        Canceladas ({{ reservasService.canceladas().length }})
+      </button>
+    </div>
+
+    <div class="loans-toolbar__controls">
+      <input
+        type="search"
+        class="loans-toolbar__search"
+        placeholder="Filtrar por título del libro…"
+        aria-label="Filtrar préstamos por título del libro"
+        [ngModel]="busquedaTitulo()"
+        (ngModelChange)="busquedaTitulo.set($event)"
+      />
+
+      <label for="loans-sort-select" class="sr-only">Ordenar préstamos</label>
+      <select
+        id="loans-sort-select"
+        class="loans-toolbar__select"
+        [ngModel]="orden()"
+        (ngModelChange)="orden.set($event)"
+      >
+        <option value="inicio-desc">Inicio (más recientes primero)</option>
+        <option value="inicio-asc">Inicio (más próximos primero)</option>
+        <option value="entrega-asc">Entrega (más próxima primero)</option>
+        <option value="entrega-desc">Entrega (más lejana primero)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  @if (reservasService.cargando()) {
+    <div class="loans-skeleton-list" aria-live="polite">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="loans-skeleton-row"></div>
+      }
+    </div>
+  } @else if (reservasService.error(); as msgError) {
+    <div class="loans-error" role="alert">
+      <h2>No pudimos cargar tus préstamos</h2>
+      <p>{{ msgError }}</p>
+      <app-button variant="primary" (clicked)="reservasService.cargarMisReservas()">
+        Reintentar
+      </app-button>
+    </div>
+  } @else if (reservasFiltradas().length === 0) {
+    <div class="loans-empty" data-testid="loans-page-empty">
+      <h2>No hay préstamos para mostrar</h2>
+      <p>
+        @if (reservasService.reservas().length === 0) {
+          Aún no has registrado ninguna reserva en la biblioteca.
+        } @else {
+          Ninguna reserva coincide con el filtro de estado o búsqueda actual.
+        }
+      </p>
+      <a routerLink="/catalog" class="loans-header__catalog-cta">Explorar catálogo</a>
+    </div>
+  } @else {
+    <div class="loans-table-wrap">
+      <table class="loans-table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Libro y ejemplar</th>
+            <th scope="col">Solicitud</th>
+            <th scope="col">Inicio del préstamo</th>
+            <th scope="col">Fecha de entrega</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reserva of reservasFiltradas(); track reserva.idReserva) {
+            @let evalCancel = evaluarCancelacion(reserva);
+            <tr [attr.data-loan-row-id]="reserva.idReserva">
+              <td data-label="ID">#{{ reserva.idReserva }}</td>
+              <td data-label="Libro">
+                <a [routerLink]="['/catalog', reserva.idLibro]" class="loans-table__book-link">
+                  {{ reserva.tituloLibro }}
+                </a>
+                <span class="loans-table__copy">Ejemplar físico #{{ reserva.idEjemplar }}</span>
+              </td>
+              <td data-label="Solicitud">
+                {{ reserva.fechaSolicitud | date: 'd MMM y, h:mm a' }}
+              </td>
+              <td data-label="Inicio">
+                {{ reserva.fechaInicio | date: 'd MMM y, h:mm a' }}
+              </td>
+              <td data-label="Entrega">
+                {{ reserva.fechaEntrega | date: 'd MMM y, h:mm a' }}
+              </td>
+              <td data-label="Estado">
+                <app-badge
+                  [text]="reserva.estadoReserva"
+                  [variant]="varianteEstado(reserva.estadoReserva)"
+                />
+              </td>
+              <td data-label="Acciones">
+                @if (reserva.estadoReserva === 'ACTIVA') {
+                  <div class="loans-table__action-cell">
+                    <button
+                      type="button"
+                      class="loans-table__cancel-btn"
+                      [disabled]="!evalCancel.puede || cancelandoId() === reserva.idReserva"
+                      [attr.title]="evalCancel.motivo || 'Cancelar reserva'"
+                      (click)="abrirConfirmacionCancelacion(reserva)"
+                    >
+                      Cancelar
+                    </button>
+                    @if (!evalCancel.puede && evalCancel.motivo) {
+                      <span class="loans-table__rule-hint">{{ evalCancel.motivo }}</span>
+                    }
+                  </div>
+                } @else {
+                  <span class="loans-table__muted-dash">—</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Diálogo de confirmación de cancelación -->
+  @if (reservaPorCancelar(); as seleccion) {
+    <div
+      class="loans-confirm-backdrop"
+      role="presentation"
+      (click)="cerrarConfirmacionCancelacion()"
+    >
+      <div
+        class="loans-confirm-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="loans-confirm-title"
+        (click)="$event.stopPropagation()"
+      >
+        <h2 id="loans-confirm-title" class="loans-confirm-dialog__title">
+          ¿Cancelar la reserva #{{ seleccion.idReserva }}?
+        </h2>
+        <p class="loans-confirm-dialog__desc">
+          Se liberará el ejemplar #{{ seleccion.idEjemplar }} de
+          <strong>«{{ seleccion.tituloLibro }}»</strong> programado para el
+          {{ seleccion.fechaInicio | date: 'd MMM y, h:mm a' }}.
+        </p>
+        <div class="loans-confirm-dialog__actions">
+          <app-button
+            variant="outline"
+            [disabled]="!!cancelandoId()"
+            (clicked)="cerrarConfirmacionCancelacion()"
+          >
+            Conservar reserva
+          </app-button>
+          <app-button
+            variant="danger"
+            [disabled]="!!cancelandoId()"
+            (clicked)="confirmarCancelacion()"
+          >
+            {{ cancelandoId() ? 'Cancelando…' : 'Confirmar cancelación' }}
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

@@ -64,7 +64,7 @@ export class LoginPageComponent {
   private readonly authService = inject(AuthService);
   private readonly notifications = inject(NotificationService);
   private readonly router = inject(Router);
-  private readonly hostEl = inject(ElementRef<HTMLElement>);
+  private readonly hostEl = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** Query parameters recibidos mediante withComponentInputBinding() */
   readonly modo = input<string | undefined>(undefined);

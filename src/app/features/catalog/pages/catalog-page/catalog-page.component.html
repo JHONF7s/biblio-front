@@ -154,7 +154,7 @@
                 min="1"
                 max="2100"
                 class="filter-group__input filter-group__input--sm"
-                [placeholder]="String(catalogoService.rangoAnios().min)"
+                [placeholder]="'' + catalogoService.rangoAnios().min"
                 [ngModel]="anioDesde() ?? ''"
                 (ngModelChange)="onCambioAnioDesde($event)"
               />
@@ -167,7 +167,7 @@
                 min="1"
                 max="2100"
                 class="filter-group__input filter-group__input--sm"
-                [placeholder]="String(catalogoService.rangoAnios().max)"
+                [placeholder]="'' + catalogoService.rangoAnios().max"
                 [ngModel]="anioHasta() ?? ''"
                 (ngModelChange)="onCambioAnioHasta($event)"
               />
