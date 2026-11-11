@@ -12,16 +12,13 @@
   white-space: nowrap;
 
   &--pill {
-    border-radius: var(--radius-full);
-    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    padding: 0.2rem 0.6rem;
   }
-
-  /* Los badges de colores mantendrán su diseño "pastel" que funciona bien en ambos modos,
-     pero el neutral necesita variables semánticas para no quedar blanco/gris estático */
 
   &--primary {
     background-color: var(--primary-50);
-    color: var(--primary-700);
+    color: var(--accent-text);
     border: 1px solid var(--primary-100);
   }
 

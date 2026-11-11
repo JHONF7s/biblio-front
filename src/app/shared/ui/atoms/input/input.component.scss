@@ -44,9 +44,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-xs);
     background-color: var(--border-color); /* Cambiado de --gray-200 */
     color: var(--text-muted); /* Cambiado de --gray-600 */
     font-size: 0.7rem;

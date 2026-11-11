@@ -26,9 +26,9 @@
     width: 100%;
   }
 
-  /* Modificador de forma (Añadido por si no lo tenías para la propiedad pill) */
+  /* Forma Apple HIG: prohibido radius-full en botones */
   &--pill {
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-md);
   }
 
   /* Sizes */
