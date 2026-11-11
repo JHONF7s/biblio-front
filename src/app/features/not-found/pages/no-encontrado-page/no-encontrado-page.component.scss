@@ -51,7 +51,7 @@
     padding: 0.15rem 0.45rem;
     border-radius: var(--radius-xs, 4px);
     color: var(--text-main);
-    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   &__actions {

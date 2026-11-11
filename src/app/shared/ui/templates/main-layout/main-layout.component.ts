@@ -195,6 +195,7 @@ export class MainLayoutComponent implements OnInit {
       next: (creada) => {
         this.enviandoReserva.set(false);
         this.onCerrarModalReserva();
+        this.uiState.abrirPanelPrestamos();
         this.notifications.show(
           `Préstamo registrado para «${creada.tituloLibro}» (Ejemplar #${creada.idEjemplar}).`,
           'success'
