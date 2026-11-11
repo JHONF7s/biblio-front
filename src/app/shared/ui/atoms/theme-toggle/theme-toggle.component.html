@@ -1,0 +1,28 @@
+<button
+  type="button"
+  class="theme-toggle"
+  [class.theme-toggle--dark]="themeService.isDarkMode()"
+  [attr.aria-label]="etiquetaAccesible()"
+  [attr.title]="etiquetaAccesible()"
+  [attr.data-theme-state]="themeService.estadoVisual()"
+  [style.--dy]="estiloDesplazamiento()"
+  (click)="alternar()"
+>
+  <svg
+    class="theme-toggle__icon"
+    viewBox="0 -32 361 218"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <polygon
+      class="mitad-oscura"
+      points="51,0 205,0 154,154 0,154"
+      fill="#000000"
+    />
+    <polygon
+      class="mitad-clara"
+      points="207,0 361,0 310,154 156,154"
+      fill="#F2EFE1"
+    />
+  </svg>
+</button>

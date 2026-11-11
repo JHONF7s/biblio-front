@@ -1,9 +1,4 @@
-.theme-toggle-wrapper {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      z-index: 9999;
-      /* Añade una pequeña sombra para que destaque flotando */
-      box-shadow: var(--shadow-lg);
-      border-radius: var(--radius-full);
-    }
+:host {
+  display: block;
+  min-height: 100vh;
+}
