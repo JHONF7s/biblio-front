@@ -1,71 +1,83 @@
+<article class="book-card squircle-surface" [attr.data-book-id]="libro().idLibro">
+  <div
+    class="book-card__cover"
+    [style.background]="portada().gradiente"
+    (click)="onVerDetalles()"
+  >
+    <div class="book-card__cover-spine" aria-hidden="true"></div>
 
-    <article class="book-card" [class.book-card--borrowed]="isBorrowed()">
-      <!-- Book Cover visual -->
-      <div
-        class="book-card__cover"
-        [style.background]="book().coverGradient"
-        (click)="onSelect()"
+    <div class="book-card__cover-top">
+      <span class="book-card__cover-initials" [style.color]="portada().acento" aria-hidden="true">
+        {{ portada().iniciales }}
+      </span>
+
+      <button
+        type="button"
+        class="book-card__fav-btn"
+        [class.book-card__fav-btn--active]="esFavorito()"
+        [attr.aria-pressed]="esFavorito()"
+        [attr.aria-label]="
+          esFavorito()
+            ? 'Quitar ' + libro().titulo + ' de favoritos'
+            : 'Agregar ' + libro().titulo + ' a favoritos'
+        "
+        [attr.title]="esFavorito() ? 'Quitar de favoritos' : 'Guardar en favoritos'"
+        (click)="onAlternarFavorito($event)"
       >
-        <div class="book-card__cover-content">
-          <span class="book-card__cover-category">{{ book().category }}</span>
-          <h4 class="book-card__cover-title">{{ book().title }}</h4>
-          <span class="book-card__cover-author">{{ book().author }}</span>
-        </div>
-        <div class="book-card__cover-spine"></div>
-      </div>
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path
+            d="M10 17.25L8.79 16.15C4.5 12.26 1.67 9.69 1.67 6.54C1.67 3.97 3.68 1.96 6.25 1.96C7.7 1.96 9.09 2.63 10 3.7C10.91 2.63 12.3 1.96 13.75 1.96C16.32 1.96 18.33 3.97 18.33 6.54C18.33 9.69 15.5 12.26 11.21 16.16L10 17.25Z"
+            [attr.fill]="esFavorito() ? 'currentColor' : 'none'"
+            stroke="currentColor"
+            stroke-width="1.6"
+          />
+        </svg>
+      </button>
+    </div>
 
-      <!-- Book Info Body -->
-      <div class="book-card__body">
-        <div class="book-card__header">
-          <app-badge [text]="book().category" variant="primary" [pill]="true" />
-          <span class="book-card__rating">
-            ⭐ {{ book().rating }}
-          </span>
-        </div>
+    <div class="book-card__cover-content">
+      <span class="book-card__cover-category">{{ libro().nombreGenero }}</span>
+      <h3 class="book-card__cover-title" [attr.title]="libro().titulo">{{ libro().titulo }}</h3>
+      <span class="book-card__cover-author">{{ nombresAutores() }}</span>
+    </div>
+  </div>
 
-        <h3 class="book-card__title" (click)="onSelect()">
-          {{ book().title }}
-        </h3>
-        <p class="book-card__author">Por {{ book().author }} ({{ book().year }})</p>
+  <div class="book-card__body">
+    <div class="book-card__header">
+      <app-badge [text]="libro().nombreGenero" variant="primary" />
+      @if (libro().anioPublicacion; as anio) {
+        <span class="book-card__year">{{ anio }}</span>
+      }
+    </div>
 
-        <p class="book-card__desc">
-          {{ book().description }}
-        </p>
+    <h3
+      class="book-card__title"
+      [attr.title]="libro().titulo"
+      (click)="onVerDetalles()"
+    >
+      {{ libro().titulo }}
+    </h3>
 
-        <!-- Availability Status -->
-        <div class="book-card__availability">
-          <span class="status-indicator" [class]="availabilityStatus().class"></span>
-          <span class="status-text">{{ availabilityStatus().text }}</span>
-        </div>
+    <p class="book-card__author">{{ nombresAutores() }}</p>
+    <p class="book-card__isbn">ISBN: {{ libro().isbn }}</p>
 
-        <!-- Action Buttons -->
-        <div class="book-card__actions">
-          <app-button
-            variant="ghost"
-            size="sm"
-            (clicked)="onSelect()"
-          >
-            Ver detalles
-          </app-button>
+    <div class="book-card__availability">
+      <span class="status-indicator" [class]="estadoDisponibilidad().clase" aria-hidden="true"></span>
+      <span class="status-text">{{ estadoDisponibilidad().texto }}</span>
+    </div>
 
-          @if (isBorrowed()) {
-            <app-button
-              variant="danger"
-              size="sm"
-              (clicked)="onReturn()"
-            >
-              Devolver
-            </app-button>
-          } @else {
-            <app-button
-              variant="primary"
-              size="sm"
-              [disabled]="book().availableCopies <= 0"
-              (clicked)="onBorrow()"
-            >
-              {{ book().availableCopies > 0 ? 'Prestar' : 'Agotado' }}
-            </app-button>
-          }
-        </div>
-      </div>
-    </article>
+    <div class="book-card__actions">
+      <app-button variant="ghost" size="sm" (clicked)="onVerDetalles()">
+        Ver detalles
+      </app-button>
+
+      <app-button
+        variant="primary"
+        size="sm"
+        (clicked)="onPedirPrestado()"
+      >
+        Pedir prestado
+      </app-button>
+    </div>
+  </div>
+</article>

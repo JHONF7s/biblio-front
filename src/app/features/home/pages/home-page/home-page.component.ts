@@ -1,61 +1,71 @@
-import { Component, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { LibraryService } from '../../../../core/services/library.service';
-import { MainLayoutComponent } from '../../../../shared/ui/templates/main-layout/main-layout.component';
-import { SearchBarComponent } from '../../../../shared/ui/molecules/search-bar/search-bar.component';
+import { Component, OnInit, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { LibroCatalogo } from '../../../../core/models/libro.model';
+import { AuthService } from '../../../../core/services/auth.service';
+import { CatalogoService } from '../../../../core/services/catalogo.service';
+import { FavoritosService } from '../../../../core/services/favoritos.service';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { ReservasService } from '../../../../core/services/reservas.service';
+import { UiStateService } from '../../../../core/services/ui-state.service';
+import { ButtonComponent } from '../../../../shared/ui/atoms/button/button.component';
 import { StatChipComponent } from '../../../../shared/ui/molecules/stat-chip/stat-chip.component';
 import { BookGridComponent } from '../../../../shared/ui/organisms/book-grid/book-grid.component';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [
-    MainLayoutComponent,
-    SearchBarComponent,
-    StatChipComponent,
-    BookGridComponent
-  ],
+  imports: [RouterLink, ButtonComponent, StatChipComponent, BookGridComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
-export class HomePageComponent {
-  private readonly libraryService = inject(LibraryService);
+export class HomePageComponent implements OnInit {
+  readonly authService = inject(AuthService);
+  readonly catalogoService = inject(CatalogoService);
+  readonly reservasService = inject(ReservasService);
+  readonly favoritosService = inject(FavoritosService);
+  private readonly uiState = inject(UiStateService);
+  private readonly notifications = inject(NotificationService);
   private readonly router = inject(Router);
 
-  // Directly bind Signals from LibraryService (Zero boilerplate reactivity!)
-  readonly books = this.libraryService.filteredBooks;
-  readonly borrowedIds = this.libraryService.borrowedBookIds;
-  readonly categories = this.libraryService.categories;
-  readonly selectedCategory = this.libraryService.selectedCategory;
-  readonly searchQuery = this.libraryService.searchQuery;
-  readonly stats = this.libraryService.libraryStats;
-
-  onSearchChange(term: string): void {
-    this.libraryService.setSearchQuery(term);
+  ngOnInit(): void {
+    this.catalogoService.cargarSiNecesario();
   }
 
-  onSearchSubmit(term: string): void {
-    this.libraryService.setSearchQuery(term);
+  onExplorarGenero(idGenero: number): void {
+    void this.router.navigate(['/catalog'], {
+      queryParams: { generos: String(idGenero) }
+    });
   }
 
-  onSelectCategory(category: string): void {
-    this.libraryService.setSelectedCategory(category);
+  onVerDetalleLibro(idLibro: number): void {
+    void this.router.navigate(['/catalog', idLibro]);
   }
 
-  onBorrowBook(bookId: string): void {
-    this.libraryService.borrowBook(bookId);
+  onPedirPrestado(libro: LibroCatalogo): void {
+    if (!this.authService.verificarSesionActiva()) {
+      this.notifications.show(
+        'Inicia sesión o crea tu cuenta para reservar este libro.',
+        'info'
+      );
+      void this.router.navigate(['/login'], {
+        queryParams: { returnUrl: `/catalog/${libro.idLibro}` }
+      });
+      return;
+    }
+
+    this.uiState.abrirModalReserva(libro);
   }
 
-  onReturnBook(bookId: string): void {
-    this.libraryService.returnBook(bookId);
+  onAlternarFavorito(idLibro: number): void {
+    const agregado = this.favoritosService.alternarFavorito(idLibro);
+    this.notifications.show(
+      agregado ? 'Libro guardado en tus favoritos.' : 'Libro eliminado de tus favoritos.',
+      'info',
+      2200
+    );
   }
 
-  onViewBookDetail(bookId: string): void {
-    this.router.navigate(['/book', bookId]);
-  }
-
-  onResetFilters(): void {
-    this.libraryService.setSearchQuery('');
-    this.libraryService.setSelectedCategory('All');
+  irACatalogoCompleto(): void {
+    void this.router.navigate(['/catalog']);
   }
 }

@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
-import { Book } from '../../../../core/models/book.model';
-import { BookCardComponent } from '../../molecules/book-card/book-card.component';
+import { LibroCatalogo } from '../../../../core/models/libro.model';
 import { ButtonComponent } from '../../atoms/button/button.component';
+import { BookCardComponent } from '../../molecules/book-card/book-card.component';
 
 @Component({
   selector: 'app-book-grid',
@@ -11,28 +11,20 @@ import { ButtonComponent } from '../../atoms/button/button.component';
   styleUrl: './book-grid.component.scss'
 })
 export class BookGridComponent {
-  readonly books = input.required<Book[]>();
-  readonly borrowedIds = input<string[]>([]);
+  readonly libros = input.required<readonly LibroCatalogo[]>();
+  readonly favoritosIds = input<readonly number[]>([]);
+  readonly tituloVacio = input<string>('No encontramos libros con esos filtros');
+  readonly descripcionVacia = input<string>(
+    'Prueba limpiando los filtros activos o buscando con otros términos.'
+  );
+  readonly textoAccionVacia = input<string>('Limpiar filtros');
 
-  // Signals for communication with parent page
-  readonly borrow = output<string>();
-  readonly returnBook = output<string>();
-  readonly selectBook = output<string>();
-  readonly resetFilters = output<void>();
+  readonly pedirPrestado = output<LibroCatalogo>();
+  readonly verDetalles = output<number>();
+  readonly alternarFavorito = output<number>();
+  readonly limpiarFiltros = output<void>();
 
-  isBorrowed(bookId: string): boolean {
-    return this.borrowedIds().includes(bookId);
-  }
-
-  onBorrow(id: string): void {
-    this.borrow.emit(id);
-  }
-
-  onReturn(id: string): void {
-    this.returnBook.emit(id);
-  }
-
-  onSelect(id: string): void {
-    this.selectBook.emit(id);
+  esFavorito(idLibro: number): boolean {
+    return this.favoritosIds().includes(idLibro);
   }
 }

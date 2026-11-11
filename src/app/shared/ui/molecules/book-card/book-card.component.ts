@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
-import { Book } from '../../../../core/models/book.model';
+import { LibroCatalogo } from '../../../../core/models/libro.model';
+import { EstiloPortadaLibro, generarEstiloPortada } from '../../../../core/utils/portada';
 import { BadgeComponent } from '../../atoms/badge/badge.component';
 import { ButtonComponent } from '../../atoms/button/button.component';
 
@@ -11,35 +12,59 @@ import { ButtonComponent } from '../../atoms/button/button.component';
   styleUrl: './book-card.component.scss'
 })
 export class BookCardComponent {
-  readonly book = input.required<Book>();
-  readonly isBorrowed = input<boolean>(false);
+  readonly libro = input.required<LibroCatalogo>();
+  readonly esFavorito = input<boolean>(false);
 
-  // Modern Output Signals
-  readonly borrow = output<string>();
-  readonly returnBook = output<string>();
-  readonly viewDetails = output<string>();
+  readonly pedirPrestado = output<LibroCatalogo>();
+  readonly verDetalles = output<number>();
+  readonly alternarFavorito = output<number>();
 
-  // Computed availability indicator
-  readonly availabilityStatus = computed(() => {
-    if (this.isBorrowed()) {
-      return { text: 'En tu posesión', class: 'status--borrowed' };
+  readonly portada = computed<EstiloPortadaLibro>(() =>
+    generarEstiloPortada(this.libro().idGenero, this.libro().titulo)
+  );
+
+  readonly nombresAutores = computed<string>(() => {
+    const lista = this.libro().autores;
+    if (!lista || lista.length === 0) {
+      return 'Autor institucional';
     }
-    const copies = this.book().availableCopies;
-    if (copies > 0) {
-      return { text: `${copies} disponibles`, class: 'status--available' };
-    }
-    return { text: 'Sin copias', class: 'status--unavailable' };
+    return lista.map((a) => a.nombreAutor).join(', ');
   });
 
-  onBorrow(): void {
-    this.borrow.emit(this.book().id);
+  readonly estadoDisponibilidad = computed<{
+    texto: string;
+    clase: string;
+    disponible: boolean;
+  }>(() => {
+    const disp = this.libro().ejemplaresDisponibles;
+    const total = this.libro().totalEjemplares;
+    if (disp > 0) {
+      return {
+        texto:
+          disp === 1
+            ? `1 disponible ahora (de ${total})`
+            : `${disp} disponibles ahora (de ${total})`,
+        clase: 'status--available',
+        disponible: true
+      };
+    }
+    return {
+      texto: 'Sin copias disponibles ahora',
+      clase: 'status--unavailable',
+      disponible: false
+    };
+  });
+
+  onPedirPrestado(): void {
+    this.pedirPrestado.emit(this.libro());
   }
 
-  onReturn(): void {
-    this.returnBook.emit(this.book().id);
+  onVerDetalles(): void {
+    this.verDetalles.emit(this.libro().idLibro);
   }
 
-  onSelect(): void {
-    this.viewDetails.emit(this.book().id);
+  onAlternarFavorito(event: MouseEvent): void {
+    event.stopPropagation();
+    this.alternarFavorito.emit(this.libro().idLibro);
   }
 }

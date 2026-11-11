@@ -1,27 +1,25 @@
-
-    <div class="book-grid-container">
-      @for (book of books(); track book.id) {
-        <app-book-card
-          [book]="book"
-          [isBorrowed]="isBorrowed(book.id)"
-          (borrow)="onBorrow($event)"
-          (returnBook)="onReturn($event)"
-          (viewDetails)="onSelect($event)"
-        />
-      } @empty {
-        <div class="book-grid-empty">
-          <div class="book-grid-empty__icon">🔍</div>
-          <h3 class="book-grid-empty__title">No se encontraron libros</h3>
-          <p class="book-grid-empty__desc">
-            Prueba ajustando los términos de búsqueda o cambiando la categoría seleccionada.
-          </p>
-          <app-button
-            variant="outline"
-            size="md"
-            (clicked)="resetFilters.emit()"
-          >
-            Restablecer filtros
-          </app-button>
-        </div>
-      }
+<div class="book-grid-container">
+  @for (libro of libros(); track libro.idLibro) {
+    <app-book-card
+      [libro]="libro"
+      [esFavorito]="esFavorito(libro.idLibro)"
+      (pedirPrestado)="pedirPrestado.emit($event)"
+      (verDetalles)="verDetalles.emit($event)"
+      (alternarFavorito)="alternarFavorito.emit($event)"
+    />
+  } @empty {
+    <div class="book-grid-empty" data-testid="book-grid-empty">
+      <div class="book-grid-empty__icon" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="18" cy="18" r="11" stroke="currentColor" stroke-width="2.2" />
+          <path d="M26 26L34 34" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+        </svg>
+      </div>
+      <h3 class="book-grid-empty__title">{{ tituloVacio() }}</h3>
+      <p class="book-grid-empty__desc">{{ descripcionVacia() }}</p>
+      <app-button variant="outline" size="md" (clicked)="limpiarFiltros.emit()">
+        {{ textoAccionVacia() }}
+      </app-button>
     </div>
+  }
+</div>

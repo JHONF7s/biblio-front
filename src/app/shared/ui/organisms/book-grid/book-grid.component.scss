@@ -1,7 +1,7 @@
 .book-grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
   width: 100%;
 }
 
@@ -12,28 +12,39 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem 2rem;
-  background-color: var(--surface-card); /* Ya es reactivo */
-  border: 2px dashed var(--border-color); /* Ya es reactivo */
-  border-radius: var(--radius-lg);
+  padding: 3.5rem 1.5rem;
+  background-color: var(--surface-card);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg, 12px);
 
   &__icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.8;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background-color: var(--primary-50);
+    color: var(--accent-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.85rem;
+
+    svg {
+      width: 26px;
+      height: 26px;
+    }
   }
 
   &__title {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    color: var(--text-main); /* Cambiado de --gray-800 para que sea blanco en modo oscuro */
-    margin-bottom: 0.5rem;
+    color: var(--text-main);
+    margin-bottom: 0.4rem;
   }
 
   &__desc {
-    color: var(--text-muted); /* Ya es reactivo */
-    font-size: 0.95rem;
-    max-width: 420px;
-    margin-bottom: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    max-width: 44ch;
+    margin-bottom: 1.25rem;
   }
 }
